@@ -1,5 +1,5 @@
 from django import forms
-from .models import Files
+from .models import File
 
 class FileUploadForm(forms.Form):
     # owner = forms.CharField(max_length=1000)

@@ -10,7 +10,7 @@ def user_directory_path(instance, filename):
 
 
 
-class Files(models.Model):
+class File(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     # owner = models.CharField(max_length=1000)
     path = models.CharField(max_length=1000)
@@ -19,6 +19,9 @@ class Files(models.Model):
 
     def __str__(self):
         return str(self.path)
+
+    class Meta:
+        unique_together = ("owner", "path")
 
     # docfile = models.FileField(upload_to=user_directory_path)
     #     db_column='docfile',

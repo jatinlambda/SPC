@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 # from django.template.context_processors import csrf
 # from django.views.decorators.csrf import csrf_exempt
 from .forms import FileUploadForm, FileDownloadForm
-from .models import Files
+from .models import File
 from django.shortcuts import render_to_response, render,redirect,get_object_or_404
 import socket
 # from django.template import RequestContext
@@ -15,7 +15,7 @@ def upload_file(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
         if form.is_valid():
-            newfile = Files()
+            newfile = File()
             newfile.owner = request.user
             newfile.sha256 = form.cleaned_data['sha256']
             # form.cleaned_data['owner']
@@ -27,9 +27,7 @@ def upload_file(request):
             else:
                 newfile.docfile = request.FILES['docfile'].read()
             newfile.save()
-            # (docfile=request.FILES['dof'], owner=form.cleaned_data['owner'], path=form.cleaned_data['path']) # ,file=request.FILES['file'])
 
-            # newfile.save()
             return redirect('home')
         else:
             return HttpResponse("<h1>Form Invalid</h1> ")
