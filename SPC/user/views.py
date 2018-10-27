@@ -1,3 +1,4 @@
+from django import db
 from django.http import HttpResponseRedirect, HttpResponse
 # from django.shortcuts import render
 # from django.template.context_processors import csrf
@@ -26,7 +27,11 @@ def upload_file(request):
                 newfile.docfile = temp
             else:
                 newfile.docfile = request.FILES['docfile'].read()
-            newfile.save()
+            try:
+                newfile.save()
+            except db.utils.IntegrityError:
+                File.objects.filter(owner=request.user, path=form.cleaned_data['path']).\
+                    update(sha256=form.cleaned_data['sha256'], docfile=request.FILES['docfile'].read())
 
             return redirect('home')
         else:

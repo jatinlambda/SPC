@@ -4,9 +4,11 @@ from user.models import File
 
 
 class FileSerializer(serializers.HyperlinkedModelSerializer):
+    owner = serializers.CharField()
     class Meta:
         model = File
         fields = ('owner', 'path', 'sha256', 'docfile')
+
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
