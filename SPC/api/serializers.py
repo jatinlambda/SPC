@@ -3,21 +3,31 @@ from rest_framework import serializers
 from user.models import File
 
 
-class FileSerializer(serializers.HyperlinkedModelSerializer):
-    owner = serializers.CharField()
-    class Meta:
-        model = File
-        fields = ('owner', 'path', 'sha256', 'docfile')
+class UserSerializer(serializers.ModelSerializer):
+    # username = serializers.HyperlinkedIdentityField(
+    #     view_name='user',
+    #     #lookup_field='username'
+    # )
 
-
-
-class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ('url', 'username', 'email', 'groups')
 
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+class FileSerializer(serializers.ModelSerializer):
+    # owner = serializers.HyperlinkedRelatedField(
+    #     view_name='user',
+    #     #lookup_field='username',
+    #     many=False,
+    #     read_only=True
+    # )
+
+    class Meta:
+        model = File
+        fields = ('owner', 'path', 'sha256', 'docfile')
+
+
+class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('url', 'name')

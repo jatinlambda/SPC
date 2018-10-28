@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Api Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+  I know you are {{ user.username }} and your password  is {{ user.password }}!
+    <!--<a href = "upload/{{user.password}}"> CLick to upload</a>-->
+    <br>
+<br>
+<a href="/api/file">Click To view File</a>
+<br>
+
+<!--<p>{{ django.contrib.auth.context_processors.auth.user.id } }</p>-->
+
+<p>
+
+      <a href="{% url 'logout' %}">Logout</a></p>
+{% else %}
+  <p>Please Login</p>
+  <a href="{% url 'login' %}">Login</a>
+
+<br>
+<br>
+<br>
+
+  <p>Or Create New User</p>
+  <a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+{% endblock %}

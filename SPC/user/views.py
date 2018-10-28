@@ -19,7 +19,6 @@ def upload_file(request):
             newfile = File()
             newfile.owner = request.user
             newfile.sha256 = form.cleaned_data['sha256']
-            # form.cleaned_data['owner']
             newfile.path = form.cleaned_data['path']
             temp = request.POST.get('docfile', False)
             if isinstance(temp, str):

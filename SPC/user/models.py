@@ -27,6 +27,23 @@ class File(models.Model):
 
     class Meta:
         unique_together = ("owner", "path")
+    #
+    # def createnew(self,**kwargs):
+    #     newfile = File()
+    #     newfile.owner = User.objects.filter(username=kwargs['owner'])
+    #     newfile.sha256 = form.cleaned_data['sha256']
+    #     newfile.path = form.cleaned_data['path']
+    #     temp = request.POST.get('docfile', False)
+    #     if isinstance(temp, str):
+    #         temp = temp.encode('utf-8')
+    #         newfile.docfile = temp
+    #     else:
+    #         newfile.docfile = request.FILES['docfile'].read()
+    #     try:
+    #         newfile.save()
+    #     except db.utils.IntegrityError:
+    #         File.objects.filter(owner=request.user, path=form.cleaned_data['path']). \
+    #             update(sha256=form.cleaned_data['sha256'], docfile=request.FILES['docfile'].read())
 
     # docfile = models.FileField(upload_to=user_directory_path)
     #     db_column='docfile',
