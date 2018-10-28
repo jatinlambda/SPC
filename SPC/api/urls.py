@@ -18,16 +18,17 @@
 #     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 # ]
 
-
-
-#
 from django.urls import path
+from django.urls import re_path
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
 urlpatterns = [
-    path(r'file/', views.FileList.as_view()),
-    # path('snippets/<int:pk>/', views.SnippetDetail.as_view()),
+    path(r'filelist/', views.FileList.as_view()),
+    path(r'fileupload/', views.FileUpload.as_view()),
+    re_path(r'^filedownload/(?P<path>.+)/', views.FileDownload.as_view()),
+    re_path(r'^fileupdate/(?P<path>.+)/', views.FileUpdate.as_view()),
+    # path(r'filedownload/()', views.FileDownload.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -19,66 +19,75 @@ class FileList(APIView):
         serializer = FileSerializer(queryset, many=True)
         return Response(serializer.data)
 
+class FileDownload(APIView):
 
+    def get(self, request, path, format=None):
+        # permission_classes = (permissions.IsAuthenticated,)
+
+        if request.user.is_authenticated :
+            queryset = File.objects.filter(owner=self.request.user, path=path)
+            serializer = FileSerializer(queryset, many=True)
+            if serializer.data == []:
+                return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response(serializer.data[0])
+        else:
+            return HttpResponse('Unauthorized', status=401)
+
+class FileUpload(APIView):
     def post(self, request, format=None):
         if request.user.is_authenticated:
             serializer = FileSerializer(data=request.data)
             # print(request.data['owner'])
             # print(request.user.id)
-            if request.user.id == request.data['owner'] :
+            if request.user.id == request.data['owner']:
                 if serializer.is_valid() :
                 #if serializer.data['owner'] == request.user :
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-                else :
+                else:
                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             else:
                 HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-        else :
+        else:
             return HttpResponse('Unauthorized', status=401)
 
 
+class FileUpdate(APIView):
+    """
+    Retrieve, update or delete a file instance.
+    """
+    def get_object(self, request, path):
+        if request.user.is_authenticated:
+            try:
+                return File.objects.get(owner=self.request.user, path=path)
+            except:
+                raise Http404
 
+            # file = File.objects.get(owner=self.request.user, path=path)
+            # if not serializer.data:
+            #     return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
+            # else:
+            #     return Response(serializer.data[0])
+        else:
+            return HttpResponse('Unauthorized', status=401)
 
+    def get(self, request, path, format=None):
+        file = self.get_object(request, path)
+        serializer = FileSerializer(file)
+        return Response(serializer.data)
 
+    def put(self, request, path, format=None):
+        file = self.get_object(request, path)
+        #newfile = File(owner=file.owner, path=file.path, sha256=request.data['sha256'], docfile=request.data['docfile'])
+        serializer = FileSerializer(file, data=request.data)
+        if serializer.is_valid():
+            file.sha256 = request.data['sha256']
+            file.docfile = request.data['docfile']
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
-# from django.contrib.auth.models import User, Group
-# from rest_framework import viewsets
-# from api.serializers import FileSerializer, UserSerializer, GroupSerializer
-# from user.models import File
-# from rest_framework import permissions
-#
-# class FileViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = File.objects.all()  # .order_by('-date_joined')
-#     serializer_class = FileSerializer
-#     permission_classes = (permissions.IsAuthenticated,)
-#     def get_queryset(self):
-#         if self.request.user.is_authenticated :
-#             if self.action == 'list':
-#                 return self.queryset.filter(owner=self.request.user)
-#             return self.queryset
-#         else :
-#             return None
-#
-#
-#
-# class UserViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows users to be viewed or edited.
-#     """
-#     queryset = User.objects.all().order_by('-date_joined')
-#     serializer_class = UserSerializer
-#
-#
-# class GroupViewSet(viewsets.ModelViewSet):
-#     """
-#     API endpoint that allows groups to be viewed or edited.
-#     """
-#     queryset = Group.objects.all()
-#     serializer_class = GroupSerializer
+    def delete(self, request, path, format=None):
+        file = self.get_object(request, path)
+        file.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
