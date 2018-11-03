@@ -1,34 +1,75 @@
-# from django.conf.urls import url, include
-# from rest_framework import routers
+#----> using basic
+#
+# from django.urls import path
+# from django.urls import re_path
 # from rest_framework.urlpatterns import format_suffix_patterns
-# from api import views
-#
-# router = routers.DefaultRouter()
-# # router.register(r'users', views.UserViewSet)
-# # router.register(r'groups', views.GroupViewSet)
-# #router.register(r'', views.FileViewSet)
-# router.register(r'file/', views.FileList.as_view(),basename='file-list')
+# from . import views
+# from rest_framework.schemas import get_schema_view
 #
 #
 #
-# # Wire up our API using automatic URL routing.
-# # Additionally, we include login URLs for the browsable API.
+# schema_view = get_schema_view(title='Pastebin API')
+#
 # urlpatterns = [
-#     url(r'^', include(router.urls)),
-#     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+#     re_path('schema/$', schema_view),
+#     path(r'filelist/', views.FileList.as_view()),
+#     path(r'fileupload/', views.FileUpload.as_view()),
+#     re_path(r'^filedownload/(?P<path>.+)/', views.FileDownload.as_view()),
+#     re_path(r'^fileupdate/(?P<path>.+)/', views.FileUpdate.as_view()),
+#     # path(r'filedownload/()', views.FileDownload.as_view()),
 # ]
+#
+# urlpatterns = format_suffix_patterns(urlpatterns)
 
-from django.urls import path
-from django.urls import re_path
-from rest_framework.urlpatterns import format_suffix_patterns
+
+
+
+
+
+#----> using viewsets
+#
+# from django.urls import re_path
+# from rest_framework.urlpatterns import format_suffix_patterns
+# from .views import FileViewSet
+# from django.urls import path
+#
+#
+# file_list = FileViewSet.as_view({
+#     'get': 'list',
+#     'post': 'create'
+# })
+#
+# file_detail = FileViewSet.as_view({
+#     'get': 'retrieve',
+#     'put': 'update',
+#     'patch': 'partial_update',
+#     'delete': 'destroy'
+# })
+#
+#
+# urlpatterns = format_suffix_patterns([
+#
+#     path('file/', file_list, name='file-list'),
+#     re_path('file/(?P<path>.+)$/', file_detail, name='file-detail'),
+#
+# ])
+
+
+#----> using router
+#
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
+from rest_framework.schemas import get_schema_view
+
+schema_view = get_schema_view(title='Pastebin API')
+
+router = DefaultRouter()
+router.register(r'file', views.FileViewSet, basename='file')
+
 
 urlpatterns = [
-    path(r'filelist/', views.FileList.as_view()),
-    path(r'fileupload/', views.FileUpload.as_view()),
-    re_path(r'^filedownload/(?P<path>.+)/', views.FileDownload.as_view()),
-    re_path(r'^fileupdate/(?P<path>.+)/', views.FileUpdate.as_view()),
-    # path(r'filedownload/()', views.FileDownload.as_view()),
+    path('schema/', schema_view),
+    path('', include(router.urls)),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)

@@ -1,2 +1,3 @@
 SPC/.idea/workspace.xml
 SPC/db.sqlite3
+*.pyc

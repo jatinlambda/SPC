@@ -8,9 +8,9 @@ def user_directory_path(instance, filename):
     return 'documents/{0}/{1}'.format(str(instance.owner)+ "/" + str(instance.path), filename)
 
 
-class FileManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(owner=request.user)
+# class FileManager(models.Manager):
+#     def get_queryset(self):
+#         return super().get_queryset().filter(owner=request.user)
 
 
 class File(models.Model):
@@ -18,9 +18,9 @@ class File(models.Model):
     # owner = models.CharField(max_length=1000)
     path = models.CharField(max_length=1000)
     sha256 = models.CharField(max_length=1000)
-    docfile = models.BinaryField()
-
-    objects = models.Manager()
+    # docfile = models.BinaryField()
+    docfile = models.TextField(blank=True)
+    # objects = models.Manager()
 
     def __str__(self):
         return str(self.path)

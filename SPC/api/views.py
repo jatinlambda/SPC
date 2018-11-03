@@ -1,13 +1,25 @@
+from django.contrib.auth.models import User
 from django.http import HttpResponse
+from rest_framework import generics
+from rest_framework import permissions
+from rest_framework import viewsets
+
+from api.permissions import IsOwner
 from user.models import File
-from .serializers import FileSerializer
+from .serializers import FileSerializer, UserSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.reverse import reverse
+
 
 class FileList(APIView):
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
     def get(self, request, format=None):
         # permission_classes = (permissions.IsAuthenticated,)
@@ -20,6 +32,8 @@ class FileList(APIView):
         return Response(serializer.data)
 
 class FileDownload(APIView):
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
     def get(self, request, path, format=None):
         # permission_classes = (permissions.IsAuthenticated,)
@@ -35,6 +49,9 @@ class FileDownload(APIView):
             return HttpResponse('Unauthorized', status=401)
 
 class FileUpload(APIView):
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     def post(self, request, format=None):
         if request.user.is_authenticated:
             serializer = FileSerializer(data=request.data)
@@ -57,6 +74,10 @@ class FileUpdate(APIView):
     """
     Retrieve, update or delete a file instance.
     """
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     def get_object(self, request, path):
         if request.user.is_authenticated:
             try:
@@ -91,3 +112,29 @@ class FileUpdate(APIView):
         file = self.get_object(request, path)
         file.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class FileViewSet(viewsets.ModelViewSet):
+    lookup_field = 'path'
+
+    def get_queryset(self):
+        return File.objects.filter(owner=self.request.user)
+
+    queryset = File.objects.filter()
+    serializer_class = FileSerializer
+    permission_classes = (permissions.IsAuthenticated,
+                          IsOwner,)
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
