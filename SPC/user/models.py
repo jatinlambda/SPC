@@ -18,12 +18,15 @@ class File(models.Model):
     # owner = models.CharField(max_length=1000)
     path = models.CharField(max_length=1000)
     sha256 = models.CharField(max_length=1000)
-    # docfile = models.BinaryField()
-    docfile = models.TextField(blank=True)
+    docfile = models.BinaryField()
+
+
+    # docfile = models.TextField(blank=True)
     # objects = models.Manager()
 
     def __str__(self):
         return str(self.path)
+
 
     class Meta:
         unique_together = ("owner", "path")

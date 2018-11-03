@@ -69,7 +69,7 @@ router.register(r'file', views.FileViewSet, basename='file')
 
 
 urlpatterns = [
-    path('schema/', schema_view),
+    # path('schema/', schema_view),
     path('', include(router.urls)),
 ]
 
