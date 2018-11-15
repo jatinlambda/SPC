@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
+from rest_framework.parsers import MultiPartParser, FormParser
 
 from api.permissions import IsOwner
 from user.models import File
@@ -127,7 +128,8 @@ from rest_framework.reverse import reverse
 
 class FileViewSet(viewsets.ModelViewSet):
     lookup_field = 'path'
-
+    lookup_value_regex = '.+'
+    # parser_classes = (MultiPartParser, FormParser,)
     def get_queryset(self):
         return File.objects.filter(owner=self.request.user)
 
@@ -139,6 +141,22 @@ class FileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
         # serializer.save(=self.request.user)
+
+    # def list(self, request, pk=None):
+    #     if pk == None:
+    #         supplements = models.Product.objects.filter(product_type=models.Product.SUPPLEMENT)
+    #     else:
+    #         supplements = models.Product.objects.get(product_type=models.Product.SUPPLEMENT, id=pk)
+    #
+    #     page = self.paginate_queryset(supplements)
+    #     if page is not None:
+    #         serializer = self.get_serializer(page, many=True)
+    #         return self.get_paginated_response(serializer.data)
+    #
+    #     serializer = self.get_serializer(page, many=True)
+    #     result_set = serializer.data
+    #
+    #     return Response(result_set)
 
 
 

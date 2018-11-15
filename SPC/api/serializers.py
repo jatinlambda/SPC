@@ -1,3 +1,5 @@
+import hashlib
+
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from rest_framework.fields import ModelField
@@ -8,13 +10,9 @@ from user.models import File
 #     class Meta:
 #         model = User
 #         fields = ('url', 'username', 'email', 'groups')
-class CoordinateField(serializers.Field):
+class DataField(serializers.Field):
     #
     def to_representation(self, value):
-        ret = {
-            "docfile": value.docfile,
-            # "y": value.y_coordinate
-        }
         return value.docfile
 
     def to_internal_value(self, data):
@@ -23,24 +21,28 @@ class CoordinateField(serializers.Field):
         }
         return ret
 
+class ShaField(serializers.Field):
+    #
+    def to_representation(self, value):
+        return value.sha256
+
+    def to_internal_value(self, data):
+        sha = hashlib.sha256()
+        sha.update(data.encode('utf-8'))
+        sha256 = sha.hexdigest()
+        ret = {
+        'sha256': sha256,
+        }
+        return ret
+
 class FileSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     # genre = serializers.SerializerMethodField()
-    docfile = CoordinateField(source='*')
+    docfile = DataField(source='*')
+    sha256 = ShaField(source='*')
     # docfile = CoordinateField()
     # docfile = ModelField(model_field=File.get_field('docfile'))
     # docfile = serializers.JSONField()
-
-    def get_genre(self, instance):
-        # get the language id from the view kwargs
-        language_id = self.context['view'].kwargs['language_pk']
-        # get the genre
-        try:
-            docfile = instance.docfile#GenresVideo.objects.get(genre_id=instance.genre_id, language_id=language_id).name
-        except GenresVideo.DoesNotExist:
-            genre_name = None
-        # return the formatted output
-        return genre_name
 
     class Meta:
         model = File
