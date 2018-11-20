@@ -40,19 +40,15 @@ class ShaField(serializers.Field):
 
 class FileSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
-    # genre = serializers.SerializerMethodField()
     docfile = DataField(source='*')
     sha256 = ShaField(source='*')
-    # docfile = CoordinateField()
-    # docfile = ModelField(model_field=File.get_field('docfile'))
-    # docfile = serializers.JSONField()
-
     class Meta:
         model = File
         fields = ('owner', 'path', 'sha256', 'docfile')
 
-
-# class GroupSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Group
-#         fields = ('url', 'name')
+class FileListSerializer(serializers.ModelSerializer):
+    # owner = serializers.ReadOnlyField(source='owner.username')
+    sha256 = ShaField(source='*')
+    class Meta:
+        model = File
+        fields = ('path', 'sha256')

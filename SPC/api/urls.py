@@ -70,6 +70,7 @@ router.register(r'file', views.FileViewSet, basename='file')
 
 urlpatterns = [
     # path('schema/', schema_view),
+    path('listfile/',views.FileList.as_view(), name='listfile'),
     path('', include(router.urls)),
 ]
 

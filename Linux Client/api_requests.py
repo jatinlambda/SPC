@@ -6,7 +6,7 @@ import hashlib
 import json
 import base64
 
-server_ip='http://127.0.0.1:8000/'
+server_ip='http://10.196.21.97:8000/'
 observing_root='./'
 
 def filehash(filepath):
@@ -38,7 +38,7 @@ def main():
 
 
     def getlist():
-        r=client.get(server_ip+'api/file/')
+        r=client.get(server_ip+'api/listfile/')
         a=r.json()
         for entry in a:
             print(entry['path'])

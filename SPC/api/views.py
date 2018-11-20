@@ -7,7 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 from api.permissions import IsOwner
 from user.models import File
-from .serializers import FileSerializer
+from .serializers import FileSerializer, FileListSerializer
 from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -129,7 +129,6 @@ from rest_framework.reverse import reverse
 class FileViewSet(viewsets.ModelViewSet):
     lookup_field = 'path'
     lookup_value_regex = '.+'
-    # parser_classes = (MultiPartParser, FormParser,)
     def get_queryset(self):
         return File.objects.filter(owner=self.request.user)
 
@@ -140,24 +139,33 @@ class FileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
-        # serializer.save(=self.request.user)
-
-    # def list(self, request, pk=None):
-    #     if pk == None:
-    #         supplements = models.Product.objects.filter(product_type=models.Product.SUPPLEMENT)
-    #     else:
-    #         supplements = models.Product.objects.get(product_type=models.Product.SUPPLEMENT, id=pk)
-    #
-    #     page = self.paginate_queryset(supplements)
-    #     if page is not None:
-    #         serializer = self.get_serializer(page, many=True)
-    #         return self.get_paginated_response(serializer.data)
-    #
-    #     serializer = self.get_serializer(page, many=True)
-    #     result_set = serializer.data
-    #
-    #     return Response(result_set)
 
 
 
+# class FileList(APIView):
+#     serializer_class = FileListSerializer
+#     permission_classes = (permissions.IsAuthenticated,
+#                           IsOwner,)
+#
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
+#
+#     def get(self, request, format=None):
+#
+#
+#         if request.user.is_authenticated :
+#                 queryset = File.objects.filter(owner=self.request.user)
+#         else:
+#             queryset = None
+#         serializer = FileSerializer(queryset, many=True)
+#         return Response(serializer.data)
+
+
+class FileList(generics.ListAPIView):
+    def get_queryset(self):
+        return File.objects.filter(owner=self.request.user)
+
+    serializer_class = FileListSerializer
+    permission_classes = (permissions.IsAuthenticated,
+                          IsOwner,)
 
