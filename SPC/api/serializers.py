@@ -22,9 +22,12 @@ class DataField(serializers.Field):
         return ret
 
 class ShaField(serializers.Field):
-    #
+
     def to_representation(self, value):
         return value.sha256
+
+    def get_value(self, instance):
+        return instance['docfile']
 
     def to_internal_value(self, data):
         sha = hashlib.sha256()

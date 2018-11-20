@@ -4,6 +4,7 @@ import getpass
 import os
 import hashlib
 import json
+import base64
 
 server_ip='http://127.0.0.1:8000/'
 observing_root='./'
@@ -46,8 +47,13 @@ def main():
     def getdetail(path):
         r=client.get(server_ip+'api/file/'+path)
         a=r.json()
+        # print(r.text)
         print('sha256:  '+a['sha256'])
-        print('data:  '+a['docfile'])
+        # print('data:  '+a['docfile'])
+        data = bytes(a['docfile'], 'utf-8')
+        data = base64.decodestring(data)
+        file = open(path, 'wb')
+        file.write(data)
         print(r.status_code)
 
     def updatefile(path):
@@ -78,9 +84,16 @@ def main():
             client.get(server_ip)
             if 'csrftoken' in client.cookies:
                 csrftoken = client.cookies['csrftoken']
-            sha = filehash(observing_root+path)
+            # sha = filehash(observing_root+path)
+            # print(sha)
             file = open(observing_root+path,'rb')
-            docfile=file.read() 
+            docfile=file.read()
+            docfile=base64.encodestring(docfile)
+            blocksize = 64*1024
+            sha = hashlib.sha256()
+            sha.update(docfile)
+            sha=sha.hexdigest()
+            print(sha) 
             # data = dict(docfile = open(observing_root+path,'rb'))
             data = dict(path = path, sha256 = sha, docfile=docfile , csrfmiddlewaretoken=csrftoken,  next='')
             r = client.post(URL_create, data=data, headers=dict(Referer=server_ip))
