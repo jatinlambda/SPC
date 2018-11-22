@@ -72,5 +72,7 @@ urlpatterns = [
     # path('schema/', schema_view),
     path('listfile/',views.FileList.as_view(), name='listfile'),
     path('', include(router.urls)),
+    path('begin/',views.begin_sync, name='begin'),
+    path('end/',views.end_sync, name='end')
 ]
 

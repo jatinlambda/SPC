@@ -51,8 +51,10 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'session_security.middleware.SessionSecurityMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'SPC.urls'
@@ -105,6 +107,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+TEMPLATE_CONTEXT_PROCESSORS=[
+    'django.core.context_processors.request',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
@@ -142,7 +147,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
-
+DATA_UPLOAD_MAX_NUMBER_FIELDS=100
+SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
 
 

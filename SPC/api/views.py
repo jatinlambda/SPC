@@ -3,169 +3,97 @@ from django.http import HttpResponse
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import viewsets
-from rest_framework.parsers import MultiPartParser, FormParser
-
+# from rest_framework.parsers import MultiPartParser, FormParser
+# from django.db import transaction
 from api.permissions import IsOwner
 from user.models import File
 from .serializers import FileSerializer, FileListSerializer
+import datetime
 from django.http import Http404
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
+from django.http import JsonResponse
 
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.reverse import reverse
+sync = []
+timer = {}
 
-
-# class FileList(APIView):
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#     def get(self, request, format=None):
-#         # permission_classes = (permissions.IsAuthenticated,)
-#
-#         if request.user.is_authenticated :
-#                 queryset = File.objects.filter(owner=self.request.user)
-#         else:
-#             queryset = None
-#         serializer = FileSerializer(queryset, many=True)
-#         return Response(serializer.data)
-#
-# class FileDownload(APIView):
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#     def get(self, request, path, format=None):
-#         # permission_classes = (permissions.IsAuthenticated,)
-#
-#         if request.user.is_authenticated :
-#             queryset = File.objects.filter(owner=self.request.user, path=path)
-#             serializer = FileSerializer(queryset, many=True)
-#             if serializer.data == []:
-#                 return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 return Response(serializer.data[0])
-#         else:
-#             return HttpResponse('Unauthorized', status=401)
-#
-# class FileUpload(APIView):
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#     def post(self, request, format=None):
-#         if request.user.is_authenticated:
-#             serializer = FileSerializer(data=request.data)
-#             # print(request.data['owner'])
-#             # print(request.user.id)
-#             if request.user.id == request.data['owner']:
-#                 if serializer.is_valid() :
-#                 #if serializer.data['owner'] == request.user :
-#                     serializer.save()
-#                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-#                 else:
-#                     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#             else:
-#                 HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             return HttpResponse('Unauthorized', status=401)
-#
-#
-# class FileUpdate(APIView):
-#     """
-#     Retrieve, update or delete a file instance.
-#     """
-#
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#     def get_object(self, request, path):
-#         if request.user.is_authenticated:
-#             try:
-#                 return File.objects.get(owner=self.request.user, path=path)
-#             except:
-#                 raise Http404
-#
-#             # file = File.objects.get(owner=self.request.user, path=path)
-#             # if not serializer.data:
-#             #     return HttpResponse(status=status.HTTP_400_BAD_REQUEST)
-#             # else:
-#             #     return Response(serializer.data[0])
-#         else:
-#             return HttpResponse('Unauthorized', status=401)
-#
-#     def get(self, request, path, format=None):
-#         file = self.get_object(request, path)
-#         serializer = FileSerializer(file)
-#         return Response(serializer.data)
-#
-#     def put(self, request, path, format=None):
-#         file = self.get_object(request, path)
-#         #newfile = File(owner=file.owner, path=file.path, sha256=request.data['sha256'], docfile=request.data['docfile'])
-#         serializer = FileSerializer(file, data=request.data)
-#         if serializer.is_valid():
-#             file.sha256 = request.data['sha256']
-#             file.docfile = request.data['docfile']
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#     def delete(self, request, path, format=None):
-#         file = self.get_object(request, path)
-#         file.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-#
-#
-#
-# class UserList(generics.ListAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#
-#
-# class UserDetail(generics.RetrieveAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
+# @transaction.Atomic
 
 
 class FileViewSet(viewsets.ModelViewSet):
+    # with transaction.atomic():
     lookup_field = 'path'
     lookup_value_regex = '.+'
-    def get_queryset(self):
-        return File.objects.filter(owner=self.request.user)
 
-    # queryset = File.objects.filter()
+    # sp = transaction.savepoint()
+
     serializer_class = FileSerializer
     permission_classes = (permissions.IsAuthenticated,
                           IsOwner,)
 
+    # @transaction.atomic
+    def get_queryset(self):
+        global timer
+        # self.request. user = self.request.user#User.objects.select_for_update().get(id=self.request.user.id)
+        now = datetime.datetime.now()
+        timer[self.request.user] = now
+        return File.objects.filter(owner=self.request.user)
+
+    # @transaction.atomic
     def perform_create(self, serializer):
+        now = datetime.datetime.now()
+        timer[self.request.user] = now
+        # print(self.request.data['path'])
         serializer.save(owner=self.request.user)
 
+    global timer
 
+    # queryset = File.objects.filter()
 
-# class FileList(APIView):
-#     serializer_class = FileListSerializer
-#     permission_classes = (permissions.IsAuthenticated,
-#                           IsOwner,)
-#
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#     def get(self, request, format=None):
-#
-#
-#         if request.user.is_authenticated :
-#                 queryset = File.objects.filter(owner=self.request.user)
-#         else:
-#             queryset = None
-#         serializer = FileSerializer(queryset, many=True)
-#         return Response(serializer.data)
+    # transaction.savepoint_rollback(sp)
 
 
 class FileList(generics.ListAPIView):
+
     def get_queryset(self):
+        # user = User.objects.select_for_update().get(id=self.request.user.id)
         return File.objects.filter(owner=self.request.user)
 
     serializer_class = FileListSerializer
-    permission_classes = (permissions.IsAuthenticated,
-                          IsOwner,)
+    permission_classes = (permissions.IsAuthenticated, IsOwner,)
 
+
+def begin_sync(request):
+    if 'id' in request.POST.keys():
+        global sync
+        global timer
+        use = request.user
+        if use in sync:
+            now = datetime.datetime.now()
+            dif = now - timer[use]
+            if dif.total_seconds() < 100:
+                js = {'possible': 'False'}
+                # timer[use], 'dif': dif.total_seconds(), 'now': now.second}
+                return JsonResponse(js)
+            else:
+                now = datetime.datetime.now()
+                timer[use] = now
+                js = {'possible': 'True'}
+                return JsonResponse(js)
+        else:
+            sync.append(use)
+            now = datetime.datetime.now()
+            timer[use] = now
+            # print(now)
+            js = {'possible': 'True'}
+            return JsonResponse(js)
+    else:
+        raise Http404('This URL is not meant for your use.')
+
+
+def end_sync(request):
+    if 'id' in request.POST.keys():
+        global sync
+        use = request.user
+        sync.remove(use)
+        return JsonResponse({'status': '200'})
+    else:
+        raise Http404('This URL is not meant for your use.')

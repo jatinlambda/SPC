@@ -40,6 +40,7 @@ def main():
     def getlist():
         r=client.get(server_ip+'api/listfile/')
         a=r.json()
+        print(a)
         for entry in a:
             print(entry['path'])
         print()

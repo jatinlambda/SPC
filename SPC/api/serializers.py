@@ -6,20 +6,33 @@ from rest_framework.fields import ModelField
 from user.models import File
 
 
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('url', 'username', 'email', 'groups')
 class DataField(serializers.Field):
-    #
     def to_representation(self, value):
         return value.docfile
 
+    def get_value(self, instance):
+        if 'isdir' not in instance.keys():
+            return [0, instance['docfile']]
+        elif instance['isdir']=='True':
+            return [1, None]
+        elif 'docfile' in instance.keys():
+            return [0, instance['docfile']]
+        else:
+            return [0,None]
+
     def to_internal_value(self, data):
-        ret = {
-        'docfile': data.encode('utf-8'),
-        }
+        if data[0]==0:
+
+            ret = {
+                'docfile': data[1].encode('utf-8'),
+            }
+        else:
+            ret = {
+                'docfile': None,
+            }
         return ret
+
+
 
 class ShaField(serializers.Field):
 
@@ -27,15 +40,33 @@ class ShaField(serializers.Field):
         return value.sha256
 
     def get_value(self, instance):
-        return instance['docfile']
+
+        if 'isdir' not in instance.keys():
+            return [0, instance['docfile']]
+        elif instance['isdir']=='True':
+            return [1, None]
+        elif 'docfile' in instance.keys():
+            print(instance['sha256'])
+            return [0, instance['docfile']]
+        else:
+            return [0, None]
 
     def to_internal_value(self, data):
-        sha = hashlib.sha256()
-        sha.update(data.encode('utf-8'))
-        sha256 = sha.hexdigest()
-        ret = {
-        'sha256': sha256,
-        }
+        # print(type(data[0]))
+        # print(data[0])
+        if data[0]==0:
+            # if data[1]==None:
+            #     raise
+            sha = hashlib.sha256()
+            sha.update(data[1].encode('utf-8'))
+            sha256 = sha.hexdigest()
+            ret = {
+                'sha256': sha256,
+            }
+        else:
+            ret = {
+                'sha256': None,
+            }
         return ret
 
 class FileSerializer(serializers.ModelSerializer):
@@ -44,11 +75,11 @@ class FileSerializer(serializers.ModelSerializer):
     sha256 = ShaField(source='*')
     class Meta:
         model = File
-        fields = ('owner', 'path', 'sha256', 'docfile')
+        fields = ('owner', 'path', 'sha256', 'docfile', 'isdir')
 
 class FileListSerializer(serializers.ModelSerializer):
     # owner = serializers.ReadOnlyField(source='owner.username')
     sha256 = ShaField(source='*')
     class Meta:
         model = File
-        fields = ('path', 'sha256')
+        fields = ('path', 'sha256', 'isdir')
