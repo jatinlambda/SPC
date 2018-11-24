@@ -1,36 +1,28 @@
-import sqlite3
-import getpass
+def initialise():
+	import sqlite3
+	import getpass
+	import os
+	if os.path.isfile("Files.db"): 
+		os.remove("Files.db")
+	mydb = sqlite3.connect("Files.db")
+	cur = mydb.cursor()
 
+	dschema='AES'
+	div='90D906A1090B9D50BEFDCEF7FC520FC0'
+	dkey='C30F3CFD3A437F9CF605C4A887F97D40'
 
-if __name__ == "__main__":
+	cur.execute('''CREATE TABLE Files (filepath varchar(200) Primary key,
+	sha256 varchar(64), stamp timestamp)''')
+	cur.execute('''CREATE TABLE User (name varchar(200) Primary key,password varchar(200))''')
+	cur.execute('''CREATE TABLE Root (root varchar(200))''')
+	cur.execute('''CREATE TABLE Server_ip (server_ip varchar(200))''')
+	cur.execute('''CREATE TABLE Schema (schema varchar(100), iv varchar(100), key varchar(100))''')
 
-    mydb = sqlite3.connect("Files.db")
-    cur = mydb.cursor()
+	cur.execute("INSERT INTO Server_ip (server_ip) VALUES ('http://127.0.0.1:8000/')")
+	cur.execute("INSERT INTO Schema VALUES (?,?,?) ",(dschema,div,dkey))
 
-    cur.execute('''CREATE TABLE Files (filepath varchar(200) Primary key,
-    sha256 varchar(64), stamp timestamp)''')
-    cur.execute('''CREATE TABLE User (name varchar(200) Primary key,
-    password varchar(200))''')
-    cur.execute('''CREATE TABLE Root (root varchar(200))''')
-    cur.execute('''CREATE TABLE Server_ip (server_ip varchar(200))''')
-    username = 'jatin'
-    password = 'jatin1234'
-    # username=input("Enter Username: ")
-    # while True:
-    #     password=getpass.getpass("Enter Password: ")
-    #     confirmpassword=getpass.getpass("Confirm Password: ")
-    #     if confirmpassword==password:
-    #         break
-
-    root=input("Observing directory path: ")
-    if root[-1]!='/':
-    	root=root+'/'
-    cur.execute("INSERT INTO Root (root) VALUES ('"+root+"')")
-    cur.execute("INSERT INTO User  VALUES (?, ?)", (username,password))
-    cur.execute("INSERT INTO Server_ip (server_ip) VALUES ('http://127.0.0.1:8000/')")
-
-    # cur.execute('''SELECT * FROM User''')
-    # for row in cur:
-    #     print(row)
-    mydb.commit()
-    mydb.close()
+	# cur.execute('''SELECT * FROM User''')
+	# for row in cur:
+	#     print(row)
+	mydb.commit()
+	mydb.close()

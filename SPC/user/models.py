@@ -19,6 +19,8 @@ class File(models.Model):
     sha256 = models.CharField(max_length=1000, null=True, blank=True)
     docfile = models.BinaryField(null=True, blank=True)
     isdir=models.BooleanField(default=False, blank=True)
+    schema = models.CharField(max_length=20, default='AES')
+
 
     def __str__(self):
         return str(self.path)

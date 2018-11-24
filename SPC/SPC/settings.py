@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'session_security',
 ]
 
 MIDDLEWARE = [
@@ -147,7 +148,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ),
 }
-DATA_UPLOAD_MAX_NUMBER_FIELDS=100
+DATA_UPLOAD_MAX_NUMBER_FIELDS=10000
 SESSION_EXPIRE_AT_BROWSER_CLOSE=True
 
 

@@ -71,6 +71,7 @@ router.register(r'file', views.FileViewSet, basename='file')
 urlpatterns = [
     # path('schema/', schema_view),
     path('listfile/',views.FileList.as_view(), name='listfile'),
+    path('listfile.json/',views.FileListjson.as_view(), name='listfile.json'),
     path('', include(router.urls)),
     path('begin/',views.begin_sync, name='begin'),
     path('end/',views.end_sync, name='end')

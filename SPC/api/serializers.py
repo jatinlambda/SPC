@@ -2,6 +2,7 @@ import hashlib
 
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import ModelField
 from user.models import File
 
@@ -40,16 +41,18 @@ class ShaField(serializers.Field):
         return value.sha256
 
     def get_value(self, instance):
-
+        sha256=None
+        if 'sha256' in instance.keys():
+            sha256=instance['sha256']
         if 'isdir' not in instance.keys():
-            return [0, instance['docfile']]
+            return [0, instance['docfile'], sha256]
         elif instance['isdir']=='True':
-            return [1, None]
+            return [1, None, sha256]
         elif 'docfile' in instance.keys():
-            print(instance['sha256'])
-            return [0, instance['docfile']]
+            # print(instance['sha256'])
+            return [0, instance['docfile'], sha256]
         else:
-            return [0, None]
+            return [0, None, sha256]
 
     def to_internal_value(self, data):
         # print(type(data[0]))
@@ -60,6 +63,8 @@ class ShaField(serializers.Field):
             sha = hashlib.sha256()
             sha.update(data[1].encode('utf-8'))
             sha256 = sha.hexdigest()
+            if sha256!=data[2]:
+                raise ValueError({'message': 'hash mismatch'})
             ret = {
                 'sha256': sha256,
             }
@@ -72,14 +77,18 @@ class ShaField(serializers.Field):
 class FileSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
     docfile = DataField(source='*')
-    sha256 = ShaField(source='*')
+    try:
+        sha256 = ShaField(source='*')
+    except:
+        raise ValidationError({'message': 'hash mismatch'})
     class Meta:
         model = File
-        fields = ('owner', 'path', 'sha256', 'docfile', 'isdir')
+        fields = ('owner', 'path', 'sha256', 'docfile', 'isdir', 'schema')
+
 
 class FileListSerializer(serializers.ModelSerializer):
     # owner = serializers.ReadOnlyField(source='owner.username')
     sha256 = ShaField(source='*')
     class Meta:
         model = File
-        fields = ('path', 'sha256', 'isdir')
+        fields = ('path', 'sha256', 'isdir', 'schema')
