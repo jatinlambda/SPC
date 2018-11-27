@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+I know you are {{ user.username }} and your password  is {{ user.password }}!
+<!--<a href = "upload/{{user.password}}"> CLick to upload</a>-->
+<br>
+<br>
+<a href="/user/upload">Click To Upload File</a>
+<br>
+<br>
+<a href="/user/upload_key">Click To Upload key file</a>
+<br>
+click the file to download
+<input type="file" id="file-input" />
+<h3>Contents of the file:</h3>
+<p id="file-content"></p>
+<br>
+<br>
+<br>
+<div id="encrypted"></div>
+<div id="decrypted"></div>
+
+<br>
+<p class="demoq"></p>
+<p class="demoq"></p>
+<br>
+<br><br>
+<button id="show">show Files</button>
+<button id="down">Download Files</button>
+{% load static %}
+<script src="{% static 'static1/out.js' %}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js">
+
+
+
+  function myfunction(){
+  var request = new XMLHttpRequest();
+
+
+  request.open('GET', 'http://127.0.0.1:8000/api/file.json', true);
+
+  fetch('http://127.0.0.1:8000/api/file.json').then(response => {
+  return response.json();
+  }).then(data => {
+  // Work with JSON data here
+
+  for (var i = 0; i < data.length; i++) {
+		      var lol= document.createElement('p');
+		      lol.innerHTML=data[i].path;
+		      lol.id=data[i].path;
+		      lol.onclick=function(){var x1=this.innerHTML;
+		      console.log(x1);
+		      var request = new XMLHttpRequest();
+
+		      request.open('GET', 'http://127.0.0.1:8000/api/file.json', true);
+
+		      fetch('http://127.0.0.1:8000/api/file.json').then(response => {
+    return response.json();
+    }).then(data => {
+    // Work with JSON data here
+    for (var j = 0; j < data.length; j++) {
+			if(data[j]["path"]==x1){
+			var last3=x1.substr(x1.length-3);
+			if(1==1){
+			var content =data[j]["docfile"];
+			var message= CryptoJS.enc.Base64.parse(content);
+			<!--//	console.log(contents);-->
+			console.log(message);
+			var key=CryptoJS.enc.Hex.parse("5D793FC5B00A2348C3FB9AB59E5CA98A");
+			var iv = CryptoJS.enc.Hex.parse("63E1155F3CF27A16C79C70A44EDCA84B");
+			var decrypted = CryptoJS.AES.decrypt({ciphertext: message}, key, {iv: iv,padding:CryptoJS.pad.NoPadding,mode:CryptoJS.mode.CBC});
+
+
+			<!--$('#decrypted').text("Decrypted: "+ decrypted );-->
+			console.log("sfsdgdfh");
+			<!--var image = new Image();-->
+
+			var out1=CryptoJS.enc.Base64.stringify(decrypted);
+
+			var image = new Image();
+			image.src="data:image/png;base64,"+out1;
+			document.body.appendChild(image);
+			}
+			//  var lol= document.createElement('p');
+			//	 lol.innerHTML=data[i].docfile;
+			//	 document.body.appendChild(lol);
+			//	 console.log(data[i].docfile,Utf8);
+			}
+			}
+			}).catch(err => {
+      // Do something for an error here
+      });
+
+      request.send();
+      };
+      document.body.appendChild(lol);
+      console.log(lol.id);
+      }
+      }).catch(err => {
+      // Do something for an error here
+      });
+
+      request.send();
+
+      }
+      document.getElementById("show").addEventListener('click', myfunction);
+      
+</script>
+<!--<p>{{ django.contrib.auth.context_processors.auth.user.id } }</p>-->
+
+<p>
+
+  <a href="{% url 'logout' %}">Logout</a></p>
+{% else %}
+<p>Please Login</p>
+<a href="{% url 'login' %}">Login</a>
+
+<br>
+<br>
+<br>
+
+<p>Or Create New User</p>
+<a href="{% url 'signup' %}">Signup</a>
+{% endif %}
+{% endblock %}

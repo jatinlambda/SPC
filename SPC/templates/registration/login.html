@@ -3,10 +3,27 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<h2>Login</h2>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+  <a class="navbar-brand" href="#">Login</a>
+</nav>
+<br><br>
+
 <form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Login</button>
+<div style="text-align:center">  {% csrf_token %}
+  {{ form.as_p }}</div>
+  <div class="wrapper" style="text-align:center;"><button type="submit" class="button button1" id="login" style="background-color: white;
+border: 2px solid #f4511e;color: black;;border-radius: 5px;
+padding: 15px 32px;text-align: center;
+text-decoration: none;display: inline-block;
+font-size: 16px;" >Login</button></div>
 </form>
+
+<br>
+<br>
+<div class="wrapper" style="text-align:center;" >
+<a href="{% url 'signup' %}" style="
+border: 2px solid #f4511e;color: black;border-radius: 5px;
+padding: 15px 32px;text-align: center;align=center;
+text-decoration: none;display: inline-block;
+font-size: 16px;" >Register Me!</a></div>
 {% endblock %}

@@ -44,7 +44,7 @@ def update():
 		if not os.path.exists(dir):
 			os.makedirs(dir)
 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Server_ip''')
 	for row in cur:
@@ -65,7 +65,8 @@ def update():
 
 	cur.execute('''SELECT * FROM Schema''')
 	for row in cur:
-	    lcschema=row[0]
+		print(row[0])
+		lcschema=row[0]
 
 
 	list_of_files=[]
@@ -184,10 +185,10 @@ def update():
 def list():
 	import os
 	import sqlite3
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Schema''')
 	dic={}
@@ -205,10 +206,10 @@ def dump():
 	import os
 	import sqlite3
 	import pickle
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Schema''')
 	dic={}

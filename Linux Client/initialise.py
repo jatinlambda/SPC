@@ -2,9 +2,9 @@ def initialise():
 	import sqlite3
 	import getpass
 	import os
-	if os.path.isfile("Files.db"): 
-		os.remove("Files.db")
-	mydb = sqlite3.connect("Files.db")
+	if os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
+		os.remove(os.path.expanduser('~') + '/SPC.db')
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 
 	dschema='AES'

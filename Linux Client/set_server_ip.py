@@ -1,10 +1,10 @@
 def set(addr):
 	import sqlite3
 	import os
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	if addr[-1]!='/':
 		addr=addr+'/'
@@ -19,10 +19,10 @@ def set(addr):
 def show():
 	import sqlite3
 	import os
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Server_ip''')
 	row = cur.fetchone()

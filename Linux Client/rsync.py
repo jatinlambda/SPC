@@ -24,7 +24,7 @@ def sync():
 	        if not os.path.exists(dir):
 	                os.makedirs(dir)
 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Server_ip''')
 	for row in cur:
@@ -85,7 +85,7 @@ def sync():
 	    return server_ip+'api/file/'+path+'/'
 
 	def getlist(mode=0):
-		global dbschema
+		dbschema=None
 		r=client.get(server_ip+'api/listfile/',stream=True)
 		a=r.json()
 		if mode==0:
@@ -275,7 +275,8 @@ def sync():
 		dbschema=dict_of_rmfiles[1]
 		dict_of_rmfiles=dict_of_rmfiles[0]
 
-		if dbschema!=lcschema:
+		print(dbschema,lcschema)
+		if dbschema!=lcschema and dbschema!=None:
 			print('Schema is outdated with server, continuing will remove all files in "'+observing_root+'"')
 			decision=input('To continue type "continue" :')
 			if decision=='continue':

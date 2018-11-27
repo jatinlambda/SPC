@@ -23,7 +23,7 @@ def lstatus():
 		    os.remove(filepath+'.enc')
 		    return sha256
 
-		mydb = sqlite3.connect("Files.db")
+		mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 		cur = mydb.cursor()
 
 		cur.execute('''SELECT * FROM Root''')

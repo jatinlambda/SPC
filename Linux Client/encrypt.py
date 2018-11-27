@@ -3,7 +3,7 @@ import sqlite3
 
 def aes(file,key,iv):
 	bash_command = 'openssl enc -aes-128-cbc -nosalt '
-	end = " -out "+ '\"'+str(file)+".enc" + '\"' 
+	end = " > "+ '\"'+str(file)+".enc" + '\"' 
 	os.system(bash_command + " -K " + str(key) + " -iv " + str(iv)  +" -base64 " + " -in "+ '\"'+ str(file) + '\"'+ end)
 	# print(bash_command + " -K " + str(key) + " -iv " + str(iv) + " -base64 " + " -in "+ str(file))# + end)
 
@@ -20,7 +20,7 @@ def des(file,key,iv):
 
 def dec_aes(file,key,iv):
 	bash_command = 'openssl enc -aes-128-cbc -d -nosalt '
-	end = " -out "+ '\"'+ str(file[:-4]) + '\"'
+	end = " > "+ '\"'+ str(file[:-4]) + '\"'
 	os.system(bash_command + " -K " + str(key) + " -iv " + str(iv)  +" -base64 " + " -in "+ '\"'+ str(file) + '\"' + end)
 	 
 
@@ -37,10 +37,11 @@ def dec_des_ede3(file,key,iv):
 	 
 def extract_key():
 	import os
-	if not os.path.isfile("Files.db"): 
+	import sqlite3
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM Schema''')
 	dic={}
@@ -53,10 +54,10 @@ def extract_key():
 
 def choose_schema():
 	import os
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	print("Choose an encryption schema:")
 	print("1 AES")
@@ -91,7 +92,11 @@ def choose_schema():
 		# print(enc,iv,key)
 		cur.execute('''DELETE FROM Schema''')
 		cur.execute("INSERT INTO Schema VALUES (?,?,?)",(enc,iv,key))
+		cur.execute("Select * From Schema")
+		for row in cur:
+			print(row)
 	os.remove('.metadata')
+	mydb.commit()
 
 		
 def change_schema():
@@ -102,11 +107,12 @@ def encrypt_file(file):
 	enc = adict['enc']
 	key = adict['key']
 	iv = adict['iv']
-	if enc == 1:
+	# print(adict)
+	if enc == 'AES':
 		aes(file,key,iv)
-	elif enc == 2:
+	elif enc == 'DES':
 		des(file,key,iv)
-	elif enc == 3:
+	elif enc == 'DES-EDE3':
 		des_ede3(file,key,iv) 
 	else:
 		print("error in dump file")
@@ -116,11 +122,11 @@ def decrypt_file(file):
 	enc = adict['enc']
 	key = adict['key']
 	iv = adict['iv']
-	if enc == 1:
+	if enc == 'AES':
 		dec_aes(file,key,iv)
-	elif enc == 2:
+	elif enc == 'DES':
 		dec_des(file,key,iv)
-	elif enc == 3:
+	elif enc == 'DES-EDE3':
 		dec_des_ede3(file,key,iv) 
 	else:
 		print("error in dump file")

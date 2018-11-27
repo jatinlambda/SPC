@@ -2,10 +2,10 @@ def edit():
 	import sqlite3
 	import getpass
 	import os
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 
 	username=input("  Username: ")
@@ -24,11 +24,11 @@ def edit():
 def show():
 	import sqlite3
 	import os
-	if not os.path.isfile("Files.db"): 
+	if not os.path.isfile(os.path.expanduser('~') + '/SPC.db'): 
 		print('  Do "SPC init" first')
 		return 
 
-	mydb = sqlite3.connect("Files.db")
+	mydb = sqlite3.connect(os.path.expanduser('~') + '/SPC.db')
 	cur = mydb.cursor()
 	cur.execute('''SELECT * FROM User''')
 	row = cur.fetchone()

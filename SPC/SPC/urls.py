@@ -29,5 +29,6 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api/', include('api.urls')),
     url(r'session_security/', include('session_security.urls')),
+    url('registration_files/', TemplateView.as_view(template_name='reg_file.html'),name='reg')
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -1,8 +1,12 @@
+import os
+
 from django import db
+from django.http import Http404
 from django.http import HttpResponseRedirect, HttpResponse
 # from django.shortcuts import render
 # from django.template.context_processors import csrf
 # from django.views.decorators.csrf import csrf_exempt
+from SPC import settings
 from .forms import FileUploadForm, FileDownloadForm
 from .models import File
 from django.shortcuts import render_to_response, render,redirect,get_object_or_404
@@ -10,6 +14,15 @@ import socket
 # from django.template import RequestContext
 # from django.urls import reverse
 
+def download_file(request):
+    path = 'SPC_script.tar.gz'
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404
 
 def upload_file(request):
     # user_id):
@@ -38,6 +51,10 @@ def upload_file(request):
     else:
         form = FileUploadForm()  # A empty, unbound form
         return render(request, 'user/list.html', {'form': form})
+
+
+
+
 
 
 # def download_file(request):

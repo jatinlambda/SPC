@@ -135,8 +135,8 @@ LOGIN_REDIRECT_URL = 'home'
 
 LOGOUT_REDIRECT_URL = 'home'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'filestore')
-MEDIA_URL = '/filestore/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'reg_file')
+MEDIA_URL = '/reg_file/'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
